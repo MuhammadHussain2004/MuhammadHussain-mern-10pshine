@@ -4,6 +4,7 @@ const pinoHttp = require('pino-http');
 require('dotenv').config();
 
 const initDB = require('./config/initDB');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
@@ -19,6 +20,9 @@ const logger = pino({
 // Middleware
 app.use(express.json());
 app.use(pinoHttp({ logger }));
+
+// Routes
+app.use('/api/auth', authRoutes);
 
 // Test route
 app.get('/', (req, res) => {
