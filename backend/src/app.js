@@ -3,6 +3,8 @@ const pino = require('pino');
 const pinoHttp = require('pino-http');
 require('dotenv').config();
 
+const initDB = require('./config/initDB');
+
 const app = express();
 
 // Logger setup
@@ -30,8 +32,20 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    logger.info(`Server running on port ${PORT}`);
-});
+
+const start = async () => {
+    try {
+        await initDB();
+        logger.info('Database initialized successfully!');
+        app.listen(PORT, () => {
+            logger.info(`Server running on port ${PORT}`);
+        });
+    } catch (error) {
+        logger.error('Failed to start server:', error);
+        process.exit(1);
+    }
+};
+
+start();
 
 module.exports = app;
