@@ -1,3 +1,4 @@
+const cors = require('cors');
 const express = require('express');
 const pino = require('pino');
 const pinoHttp = require('pino-http');
@@ -19,6 +20,7 @@ const logger = pino({
 });
 
 // Middleware
+app.use(cors());
 app.use(express.json());
 app.use(pinoHttp({ logger }));
 
