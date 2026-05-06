@@ -1,4 +1,6 @@
+const testEmail = `testuser_${Date.now()}@test.com`;
 const chai = require('chai');
+
 const chaiHttp = require('chai-http');
 const app = require('../app');
 
@@ -13,7 +15,7 @@ describe('Auth APIs', () => {
                 .post('/api/auth/register')
                 .send({
                     name: 'Test User',
-                    email: 'testuser@test.com',
+                    email: testEmail,
                     password: 'test1234'
                 })
                 .end((err, res) => {
@@ -28,7 +30,7 @@ describe('Auth APIs', () => {
                 .post('/api/auth/register')
                 .send({
                     name: 'Test User',
-                    email: 'testuser@test.com',
+                    email: testEmail,
                     password: 'test1234'
                 })
                 .end((err, res) => {
