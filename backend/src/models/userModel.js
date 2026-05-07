@@ -19,7 +19,7 @@ const UserModel = {
 
     verifyEmail: async (email, code) => {
         const [rows] = await pool.execute(
-            'SELECT * FROM users WHERE email = ? AND verification_code = ? AND verification_expires > NOW()',
+            'SELECT * FROM users WHERE email = ? AND verification_code = ? AND verification_expires > NOW() AND is_verified = FALSE',
             [email, code]
         );
         if (rows[0]) {
@@ -38,6 +38,13 @@ const UserModel = {
             [id]
         );
         return rows[0];
+    },
+
+    updateVerificationCode: async (email, hashedPassword, verificationCode, verificationExpires) => {
+        await pool.execute(
+            'UPDATE users SET password = ?, verification_code = ?, verification_expires = ? WHERE email = ?',
+            [hashedPassword, verificationCode, verificationExpires, email]
+        );
     }
 };
 

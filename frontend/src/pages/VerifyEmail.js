@@ -1,24 +1,25 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { login } from '../services/api';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { verifyEmail } from '../services/api';
 
-function Login() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+function VerifyEmail() {
+    const [code, setCode] = useState('');
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const email = searchParams.get('email');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
-            const res = await login({ email, password });
-            localStorage.setItem('token', res.data.token);
-            localStorage.setItem('user', JSON.stringify(res.data.user));
-            navigate('/dashboard');
+            await verifyEmail({ email, code });
+            setSuccess('Email verified! Redirecting to login...');
+            setTimeout(() => navigate('/login'), 2000);
         } catch (err) {
-            setError(err.response?.data?.message || 'Login failed!');
+            setError(err.response?.data?.message || 'Verification failed!');
         } finally {
             setLoading(false);
         }
@@ -27,39 +28,33 @@ function Login() {
     return (
         <div style={styles.container}>
             <div style={styles.card}>
-                <div style={styles.logo}>📝</div>
-                <h1 style={styles.title}>Notes App</h1>
-                <p style={styles.subtitle}>Welcome back!</p>
+                <div style={styles.logo}>📧</div>
+                <h1 style={styles.title}>Verify Email</h1>
+                <p style={styles.subtitle}>
+                    We sent a 6-digit code to<br />
+                    <strong style={{ color: '#4a90e2' }}>{email}</strong>
+                </p>
                 {error && <div style={styles.error}>{error}</div>}
+                {success && <div style={styles.success}>{success}</div>}
                 <form onSubmit={handleSubmit}>
                     <div style={styles.inputGroup}>
-                        <span style={styles.inputIcon}>✉️</span>
+                        <span style={styles.inputIcon}>🔑</span>
                         <input
                             style={styles.input}
-                            type="email"
-                            placeholder="Email address"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div style={styles.inputGroup}>
-                        <span style={styles.inputIcon}>🔒</span>
-                        <input
-                            style={styles.input}
-                            type="password"
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            type="text"
+                            placeholder="Enter 6-digit code"
+                            value={code}
+                            onChange={(e) => setCode(e.target.value)}
+                            maxLength={6}
                             required
                         />
                     </div>
                     <button style={styles.button} type="submit" disabled={loading}>
-                        {loading ? 'Logging in...' : 'Login'}
+                        {loading ? 'Verifying...' : 'Verify Email'}
                     </button>
                 </form>
                 <p style={styles.link}>
-                    Don't have an account? <Link to="/register" style={styles.linkText}>Register</Link>
+                    <Link to="/login" style={styles.linkText}>Back to Login</Link>
                 </p>
             </div>
         </div>
@@ -85,12 +80,21 @@ const styles = {
         textAlign: 'center',
     },
     logo: { fontSize: '50px', marginBottom: '10px' },
-    title: { color: '#4a90e2', fontSize: '28px', marginBottom: '5px' },
-    subtitle: { color: '#888', marginBottom: '30px', fontSize: '14px' },
+    title: { color: '#4a90e2', fontSize: '28px', marginBottom: '10px' },
+    subtitle: { color: '#888', marginBottom: '30px', fontSize: '14px', lineHeight: '1.6' },
     error: {
         background: 'rgba(231,76,60,0.2)',
         border: '1px solid #e74c3c',
         color: '#e74c3c',
+        padding: '10px',
+        borderRadius: '8px',
+        marginBottom: '15px',
+        fontSize: '14px',
+    },
+    success: {
+        background: 'rgba(46,213,115,0.2)',
+        border: '1px solid #2ed573',
+        color: '#2ed573',
         padding: '10px',
         borderRadius: '8px',
         marginBottom: '15px',
@@ -112,8 +116,10 @@ const styles = {
         background: 'transparent',
         border: 'none',
         color: '#e0e0e0',
-        fontSize: '14px',
+        fontSize: '18px',
+        letterSpacing: '5px',
         width: '100%',
+        textAlign: 'center',
     },
     button: {
         width: '100%',
@@ -131,4 +137,4 @@ const styles = {
     linkText: { color: '#4a90e2', textDecoration: 'none', fontWeight: 'bold' },
 };
 
-export default Login;
+export default VerifyEmail;

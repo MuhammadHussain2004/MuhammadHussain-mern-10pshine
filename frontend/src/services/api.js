@@ -1,4 +1,5 @@
 import axios from 'axios';
+export const verifyEmail = (data) => API.post('/auth/verify-email', data);
 
 const API = axios.create({
     baseURL: 'http://localhost:5000/api',

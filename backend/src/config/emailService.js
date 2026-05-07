@@ -28,7 +28,6 @@ const sendVerificationEmail = async (email, name, verificationCode) => {
       </div>
     `,
     };
-
     await transporter.sendMail(mailOptions);
 };
 
