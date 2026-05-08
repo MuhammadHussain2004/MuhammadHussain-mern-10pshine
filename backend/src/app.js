@@ -1,6 +1,6 @@
 const cors = require('cors');
 const express = require('express');
-const pino = require('pino');
+const { logger } = require('./config/logger');
 const pinoHttp = require('pino-http');
 require('dotenv').config();
 
@@ -10,14 +10,7 @@ const notesRoutes = require('./routes/notesRoutes');
 
 const app = express();
 
-// Logger setup
-const logger = pino({
-    level: 'info',
-    transport: {
-        target: 'pino-pretty',
-        options: { colorize: true }
-    }
-});
+
 
 // Middleware
 app.use(cors());

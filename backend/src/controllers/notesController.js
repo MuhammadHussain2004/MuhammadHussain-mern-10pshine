@@ -1,4 +1,5 @@
 const NoteModel = require('../models/noteModel');
+const { logActivity } = require('../config/logger');
 
 const notesController = {
     // Get all notes
@@ -27,11 +28,13 @@ const notesController = {
     // Create note
     createNote: async (req, res, next) => {
         try {
-            const { title, content } = req.body;
+            const { title, content, color, priority, category } = req.body;
             if (!title) {
                 return res.status(400).json({ message: 'Title is required!' });
             }
-            const noteId = await NoteModel.create(title, content, req.userId);
+            const noteId = await NoteModel.create(title, content, req.userId, color, priority, category);
+
+            logActivity('NOTE_CREATED', req.userId, { noteId, title });
             res.status(201).json({
                 message: 'Note created successfully!',
                 noteId
@@ -41,16 +44,18 @@ const notesController = {
         }
     },
 
-    // Update note
+    //Update note
     updateNote: async (req, res, next) => {
         try {
-            const { title, content } = req.body;
+            const { title, content, color, priority, category } = req.body;
             const affected = await NoteModel.update(
-                req.params.id, title, content, req.userId
+                req.params.id, title, content, color, priority, category, req.userId
             );
             if (!affected) {
                 return res.status(404).json({ message: 'Note not found!' });
             }
+
+            logActivity('NOTE_UPDATED', req.userId, { noteId: req.params.id });
             res.json({ message: 'Note updated successfully!' });
         } catch (error) {
             next(error);
@@ -64,6 +69,8 @@ const notesController = {
             if (!affected) {
                 return res.status(404).json({ message: 'Note not found!' });
             }
+
+            logActivity('NOTE_DELETED', req.userId, { noteId: req.params.id });
             res.json({ message: 'Note deleted successfully!' });
         } catch (error) {
             next(error);
