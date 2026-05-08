@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import VerifyEmail from './pages/VerifyEmail';
+import Profile from './pages/Profile';
 
 const PrivateRoute = ({ children }) => {
     const token = localStorage.getItem('token');
@@ -23,6 +24,11 @@ function App() {
                     </PrivateRoute>
                 } />
                 <Route path="/" element={<Navigate to="/login" />} />
+                <Route path="/profile" element={
+                    <PrivateRoute>
+                        <Profile />
+                    </PrivateRoute>
+                } />
             </Routes>
         </BrowserRouter>
     );
