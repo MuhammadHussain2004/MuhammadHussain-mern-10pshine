@@ -26,115 +26,180 @@ function VerifyEmail() {
     };
 
     return (
-        <div style={styles.container}>
-            <div style={styles.card}>
-                <div style={styles.logo}>📧</div>
-                <h1 style={styles.title}>Verify Email</h1>
-                <p style={styles.subtitle}>
-                    We sent a 6-digit code to<br />
-                    <strong style={{ color: '#4a90e2' }}>{email}</strong>
+        <div style={s.container}>
+            <div style={s.card}>
+                <div style={s.logoRow}>
+                    <svg width="42" height="42" viewBox="0 0 48 48" fill="none">
+                        <rect width="48" height="48" rx="14" fill="#fbbc04" />
+                        <rect x="12" y="15" width="24" height="4" rx="2" fill="#fff" />
+                        <rect x="12" y="22" width="18" height="4" rx="2" fill="#fff" />
+                        <rect x="12" y="29" width="14" height="4" rx="2" fill="#fff" />
+                    </svg>
+                    <span style={s.logoText}>NoteFlow</span>
+                </div>
+
+                <div style={s.iconBox}>📧</div>
+                <h2 style={s.title}>Check your email</h2>
+                <p style={s.subtitle}>
+                    We sent a 6-digit verification code to<br />
+                    <strong style={{ color: '#fbbc04' }}>{email}</strong>
                 </p>
-                {error && <div style={styles.error}>{error}</div>}
-                {success && <div style={styles.success}>{success}</div>}
+
+                {error && <div style={s.error}>{error}</div>}
+                {success && <div style={s.success}>{success}</div>}
+
                 <form onSubmit={handleSubmit}>
-                    <div style={styles.inputGroup}>
-                        <span style={styles.inputIcon}>🔑</span>
+                    <div style={s.field}>
+                        <label style={s.label}>Verification Code</label>
                         <input
-                            style={styles.input}
+                            style={s.codeInput}
                             type="text"
-                            placeholder="Enter 6-digit code"
+                            placeholder="000000"
                             value={code}
                             onChange={(e) => setCode(e.target.value)}
                             maxLength={6}
                             required
                         />
                     </div>
-                    <button style={styles.button} type="submit" disabled={loading}>
-                        {loading ? 'Verifying...' : 'Verify Email'}
+                    <button style={s.button} type="submit" disabled={loading}>
+                        {loading ? 'Verifying...' : 'Verify Email →'}
                     </button>
                 </form>
-                <p style={styles.link}>
-                    <Link to="/login" style={styles.linkText}>Back to Login</Link>
-                </p>
+
+                <div style={s.divider}><span style={s.dividerText}>Wrong email?</span></div>
+                <Link to="/register" style={s.backBtn}>Go back to Register</Link>
             </div>
         </div>
     );
 }
 
-const styles = {
+const s = {
     container: {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%)',
+        background: '#202124',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: "'Segoe UI', sans-serif",
+        padding: '20px',
     },
     card: {
-        background: 'rgba(255,255,255,0.05)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        padding: '50px 40px',
+        width: '100%',
+        maxWidth: '420px',
+        background: '#292a2d',
         borderRadius: '20px',
-        width: '400px',
-        boxShadow: '0 25px 50px rgba(0,0,0,0.5)',
+        padding: '48px 44px',
+        boxShadow: '0 8px 40px rgba(0,0,0,0.4)',
+        border: '1px solid #3c4043',
         textAlign: 'center',
     },
-    logo: { fontSize: '50px', marginBottom: '10px' },
-    title: { color: '#4a90e2', fontSize: '28px', marginBottom: '10px' },
-    subtitle: { color: '#888', marginBottom: '30px', fontSize: '14px', lineHeight: '1.6' },
-    error: {
-        background: 'rgba(231,76,60,0.2)',
-        border: '1px solid #e74c3c',
-        color: '#e74c3c',
-        padding: '10px',
-        borderRadius: '8px',
-        marginBottom: '15px',
-        fontSize: '14px',
-    },
-    success: {
-        background: 'rgba(46,213,115,0.2)',
-        border: '1px solid #2ed573',
-        color: '#2ed573',
-        padding: '10px',
-        borderRadius: '8px',
-        marginBottom: '15px',
-        fontSize: '14px',
-    },
-    inputGroup: {
+    logoRow: {
         display: 'flex',
         alignItems: 'center',
-        background: 'rgba(255,255,255,0.07)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        borderRadius: '10px',
-        marginBottom: '15px',
-        padding: '0 15px',
+        gap: '12px',
+        marginBottom: '24px',
+        justifyContent: 'center',
     },
-    inputIcon: { fontSize: '18px', marginRight: '10px' },
-    input: {
-        flex: 1,
-        padding: '14px 0',
-        background: 'transparent',
-        border: 'none',
-        color: '#e0e0e0',
-        fontSize: '18px',
-        letterSpacing: '5px',
+    logoText: {
+        fontSize: '24px',
+        fontWeight: '700',
+        color: '#fbbc04',
+    },
+    iconBox: {
+        fontSize: '48px',
+        marginBottom: '16px',
+    },
+    title: {
+        fontSize: '26px',
+        fontWeight: '700',
+        color: '#e8eaed',
+        margin: '0 0 8px',
+    },
+    subtitle: {
+        fontSize: '14px',
+        color: '#9aa0a6',
+        marginBottom: '32px',
+        lineHeight: '1.7',
+    },
+    error: {
+        background: 'rgba(242,139,130,0.15)',
+        border: '1px solid #f28b82',
+        color: '#f28b82',
+        padding: '12px 16px',
+        borderRadius: '8px',
+        marginBottom: '20px',
+        fontSize: '13px',
+    },
+    success: {
+        background: 'rgba(129,201,149,0.15)',
+        border: '1px solid #81c995',
+        color: '#81c995',
+        padding: '12px 16px',
+        borderRadius: '8px',
+        marginBottom: '20px',
+        fontSize: '13px',
+    },
+    field: {
+        marginBottom: '18px',
+        textAlign: 'left',
+    },
+    label: {
+        display: 'block',
+        fontSize: '13px',
+        fontWeight: '600',
+        color: '#9aa0a6',
+        marginBottom: '6px',
+    },
+    codeInput: {
         width: '100%',
+        padding: '14px',
+        border: '1px solid #3c4043',
+        borderRadius: '10px',
+        fontSize: '24px',
+        color: '#e8eaed',
+        background: '#303134',
+        boxSizing: 'border-box',
+        outline: 'none',
+        letterSpacing: '8px',
         textAlign: 'center',
+        fontWeight: '700',
     },
     button: {
         width: '100%',
-        padding: '14px',
-        background: 'linear-gradient(135deg, #4a90e2, #7b2ff7)',
-        color: 'white',
+        padding: '13px',
+        background: '#fbbc04',
+        color: '#202124',
         border: 'none',
         borderRadius: '10px',
-        fontSize: '16px',
-        fontWeight: 'bold',
-        marginTop: '10px',
-        boxShadow: '0 5px 15px rgba(74,144,226,0.4)',
+        fontSize: '15px',
+        fontWeight: '700',
+        cursor: 'pointer',
+        marginTop: '8px',
+        boxShadow: '0 4px 12px rgba(251,188,4,0.3)',
     },
-    link: { marginTop: '20px', color: '#888', fontSize: '14px' },
-    linkText: { color: '#4a90e2', textDecoration: 'none', fontWeight: 'bold' },
+    divider: {
+        textAlign: 'center',
+        margin: '24px 0 16px',
+    },
+    dividerText: {
+        fontSize: '13px',
+        color: '#5f6368',
+    },
+    backBtn: {
+        display: 'block',
+        width: '100%',
+        padding: '13px',
+        background: 'transparent',
+        color: '#8ab4f8',
+        border: '1px solid #3c4043',
+        borderRadius: '10px',
+        fontSize: '14px',
+        fontWeight: '600',
+        cursor: 'pointer',
+        textAlign: 'center',
+        textDecoration: 'none',
+        boxSizing: 'border-box',
+    },
 };
 
 export default VerifyEmail;

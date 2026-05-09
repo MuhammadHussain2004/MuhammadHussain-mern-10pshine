@@ -3,142 +3,201 @@ import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../services/api';
 
 function Register() {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-            await register({ name, email, password });
-            navigate(`/verify-email?email=${email}`);
-        } catch (err) {
-            setError(err.response?.data?.message || 'Registration failed!');
-        } finally {
-            setLoading(false);
-        }
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await register({ name, email, password });
+      navigate(`/verify-email?email=${email}`);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed!');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <div style={styles.container}>
-            <div style={styles.card}>
-                <div style={styles.logo}>📝</div>
-                <h1 style={styles.title}>Notes App</h1>
-                <p style={styles.subtitle}>Create your account</p>
-                {error && <div style={styles.error}>{error}</div>}
-                <form onSubmit={handleSubmit}>
-                    <div style={styles.inputGroup}>
-                        <span style={styles.inputIcon}>👤</span>
-                        <input
-                            style={styles.input}
-                            type="text"
-                            placeholder="Full Name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div style={styles.inputGroup}>
-                        <span style={styles.inputIcon}>✉️</span>
-                        <input
-                            style={styles.input}
-                            type="email"
-                            placeholder="Email address"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div style={styles.inputGroup}>
-                        <span style={styles.inputIcon}>🔒</span>
-                        <input
-                            style={styles.input}
-                            type="password"
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <button style={styles.button} type="submit" disabled={loading}>
-                        {loading ? 'Creating account...' : 'Register'}
-                    </button>
-                </form>
-                <p style={styles.link}>
-                    Already have an account? <Link to="/login" style={styles.linkText}>Login</Link>
-                </p>
-            </div>
+  return (
+    <div style={s.container}>
+      <div style={s.card}>
+        <div style={s.logoRow}>
+          <svg width="42" height="42" viewBox="0 0 48 48" fill="none">
+            <rect width="48" height="48" rx="14" fill="#fbbc04"/>
+            <rect x="12" y="15" width="24" height="4" rx="2" fill="#fff"/>
+            <rect x="12" y="22" width="18" height="4" rx="2" fill="#fff"/>
+            <rect x="12" y="29" width="14" height="4" rx="2" fill="#fff"/>
+          </svg>
+          <span style={s.logoText}>NoteFlow</span>
         </div>
-    );
+
+        <h2 style={s.title}>Create account</h2>
+        <p style={s.subtitle}>Join NoteFlow and start organizing</p>
+
+        {error && <div style={s.error}>{error}</div>}
+
+        <form onSubmit={handleSubmit}>
+          <div style={s.field}>
+            <label style={s.label}>Full Name</label>
+            <input
+              style={s.input}
+              type="text"
+              placeholder="Enter Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+          <div style={s.field}>
+            <label style={s.label}>Email address</label>
+            <input
+              style={s.input}
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div style={s.field}>
+            <label style={s.label}>Password</label>
+            <input
+              style={s.input}
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button style={s.button} type="submit" disabled={loading}>
+            {loading ? 'Creating account...' : 'Create account →'}
+          </button>
+        </form>
+
+        <div style={s.divider}><span style={s.dividerText}>Already have an account?</span></div>
+        <Link to="/login" style={s.loginBtn}>Sign in</Link>
+      </div>
+    </div>
+  );
 }
 
-const styles = {
-    container: {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%)',
-    },
-    card: {
-        background: 'rgba(255,255,255,0.05)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        padding: '50px 40px',
-        borderRadius: '20px',
-        width: '400px',
-        boxShadow: '0 25px 50px rgba(0,0,0,0.5)',
-        textAlign: 'center',
-    },
-    logo: { fontSize: '50px', marginBottom: '10px' },
-    title: { color: '#4a90e2', fontSize: '28px', marginBottom: '5px' },
-    subtitle: { color: '#888', marginBottom: '30px', fontSize: '14px' },
-    error: {
-        background: 'rgba(231,76,60,0.2)',
-        border: '1px solid #e74c3c',
-        color: '#e74c3c',
-        padding: '10px',
-        borderRadius: '8px',
-        marginBottom: '15px',
-        fontSize: '14px',
-    },
-    inputGroup: {
-        display: 'flex',
-        alignItems: 'center',
-        background: 'rgba(255,255,255,0.07)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        borderRadius: '10px',
-        marginBottom: '15px',
-        padding: '0 15px',
-    },
-    inputIcon: { fontSize: '18px', marginRight: '10px' },
-    input: {
-        flex: 1,
-        padding: '14px 0',
-        background: 'transparent',
-        border: 'none',
-        color: '#e0e0e0',
-        fontSize: '14px',
-        width: '100%',
-    },
-    button: {
-        width: '100%',
-        padding: '14px',
-        background: 'linear-gradient(135deg, #4a90e2, #7b2ff7)',
-        color: 'white',
-        border: 'none',
-        borderRadius: '10px',
-        fontSize: '16px',
-        fontWeight: 'bold',
-        marginTop: '10px',
-        boxShadow: '0 5px 15px rgba(74,144,226,0.4)',
-    },
-    link: { marginTop: '20px', color: '#888', fontSize: '14px' },
-    linkText: { color: '#4a90e2', textDecoration: 'none', fontWeight: 'bold' },
+const s = {
+  container: {
+    minHeight: '100vh',
+    background: '#202124',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontFamily: "'Segoe UI', sans-serif",
+    padding: '20px',
+  },
+  card: {
+    width: '100%',
+    maxWidth: '420px',
+    background: '#292a2d',
+    borderRadius: '20px',
+    padding: '48px 44px',
+    boxShadow: '0 8px 40px rgba(0,0,0,0.4)',
+    border: '1px solid #3c4043',
+  },
+  logoRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    marginBottom: '32px',
+    justifyContent: 'center',
+  },
+  logoText: {
+    fontSize: '24px',
+    fontWeight: '700',
+    color: '#fbbc04',
+  },
+  title: {
+    fontSize: '26px',
+    fontWeight: '700',
+    color: '#e8eaed',
+    margin: '0 0 8px',
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: '14px',
+    color: '#9aa0a6',
+    marginBottom: '32px',
+    textAlign: 'center',
+  },
+  error: {
+    background: 'rgba(242,139,130,0.15)',
+    border: '1px solid #f28b82',
+    color: '#f28b82',
+    padding: '12px 16px',
+    borderRadius: '8px',
+    marginBottom: '20px',
+    fontSize: '13px',
+    textAlign: 'center',
+  },
+  field: {
+    marginBottom: '18px',
+  },
+  label: {
+    display: 'block',
+    fontSize: '13px',
+    fontWeight: '600',
+    color: '#9aa0a6',
+    marginBottom: '6px',
+  },
+  input: {
+    width: '100%',
+    padding: '12px 14px',
+    border: '1px solid #3c4043',
+    borderRadius: '10px',
+    fontSize: '14px',
+    color: '#e8eaed',
+    background: '#303134',
+    boxSizing: 'border-box',
+    outline: 'none',
+  },
+  button: {
+    width: '100%',
+    padding: '13px',
+    background: '#fbbc04',
+    color: '#202124',
+    border: 'none',
+    borderRadius: '10px',
+    fontSize: '15px',
+    fontWeight: '700',
+    cursor: 'pointer',
+    marginTop: '8px',
+    boxShadow: '0 4px 12px rgba(251,188,4,0.3)',
+  },
+  divider: {
+    textAlign: 'center',
+    margin: '24px 0 16px',
+  },
+  dividerText: {
+    fontSize: '13px',
+    color: '#5f6368',
+  },
+  loginBtn: {
+    display: 'block',
+    width: '100%',
+    padding: '13px',
+    background: 'transparent',
+    color: '#8ab4f8',
+    border: '1px solid #3c4043',
+    borderRadius: '10px',
+    fontSize: '14px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    textAlign: 'center',
+    textDecoration: 'none',
+    boxSizing: 'border-box',
+  },
 };
 
 export default Register;
