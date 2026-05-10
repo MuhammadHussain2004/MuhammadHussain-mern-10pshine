@@ -35,7 +35,13 @@ app.get('/', (req, res) => {
 
 // Global Exception Handler
 app.use((err, req, res, next) => {
-    logger.error(err);
+    logger.error({
+        msg: 'Global Exception caught',
+        error: err.message,
+        stack: err.stack,
+        url: req.url,
+        method: req.method,
+    });
     res.status(500).json({ message: 'Something went wrong!' });
 });
 
