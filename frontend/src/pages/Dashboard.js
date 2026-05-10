@@ -4,6 +4,7 @@ import { getNotes, createNote, updateNote, deleteNote } from '../services/api';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Markdown from 'markdown-to-jsx';
+import { saveAs } from 'file-saver';
 
 
 const PRIORITIES = ['low', 'medium', 'high'];
@@ -105,6 +106,39 @@ function Dashboard() {
         navigate('/login');
     };
 
+
+    const exportNotes = () => {
+        const dataStr = JSON.stringify(notes, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        saveAs(blob, 'notes-export.json');
+    };
+
+    const importNotes = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            try {
+                const importedNotes = JSON.parse(event.target.result);
+                for (const note of importedNotes) {
+                    await createNote({
+                        title: note.title,
+                        content: note.content,
+                        color: note.color,
+                        priority: note.priority,
+                        category: note.category
+                    });
+                }
+                fetchNotes();
+                alert('Notes imported successfully!');
+            } catch (err) {
+                alert('Invalid file format!');
+            }
+        };
+        reader.readAsText(file);
+    };
+
+
     const filteredNotes = notes.filter(note => {
         const matchSearch = note.title.toLowerCase().includes(search.toLowerCase()) ||
             note.content?.toLowerCase().includes(search.toLowerCase());
@@ -203,6 +237,15 @@ function Dashboard() {
                     >
                         <span style={{ fontSize: '18px' }}>+</span> New Note
                     </button>
+
+                    <button onClick={exportNotes} style={{ width: '100%', padding: '10px 16px', background: 'transparent', border: `1px solid ${dm.border}`, borderRadius: '12px', color: dm.text, fontWeight: '500', fontSize: '13px', cursor: 'pointer', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        ⬇️ Export Notes
+                    </button>
+
+                    <label style={{ width: '100%', padding: '10px 16px', background: 'transparent', border: `1px solid ${dm.border}`, borderRadius: '12px', color: dm.text, fontWeight: '500', fontSize: '13px', cursor: 'pointer', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxSizing: 'border-box' }}>
+                        ⬆️ Import Notes
+                        <input type="file" accept=".json" onChange={importNotes} style={{ display: 'none' }} />
+                    </label>
 
                     {/* Stats */}
                     <div style={{ marginBottom: '20px', padding: '0 8px' }}>
