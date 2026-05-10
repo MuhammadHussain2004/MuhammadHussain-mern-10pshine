@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getNotes, createNote, updateNote, deleteNote } from '../services/api';
-
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Markdown from 'markdown-to-jsx';
 
 
 const PRIORITIES = ['low', 'medium', 'high'];
@@ -23,6 +25,21 @@ function Dashboard() {
     const [darkMode, setDarkMode] = useState(false);
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
+
+
+    const editor = useEditor({
+        extensions: [StarterKit],
+        content: content,
+        onUpdate: ({ editor }) => {
+            setContent(editor.getHTML());
+        },
+    });
+
+    useEffect(() => {
+        if (editor && showForm) {
+            editor.commands.setContent(content || '');
+        }
+    }, [showForm, editor, content]);
 
     const NOTE_COLORS = [
         { bg: darkMode ? '#ffffff' : '#3c3c3c', label: darkMode ? 'White' : 'Dark Gray' },
@@ -272,7 +289,9 @@ function Dashboard() {
 
                                         {/* Content */}
                                         {note.content && (
-                                            <p style={{ color: cardText, fontSize: '13px', lineHeight: '1.6', margin: '0 0 14px', opacity: 0.85 }}>{note.content}</p>
+                                            <div style={{ maxHeight: '80px', overflow: 'hidden', fontSize: '13px', lineHeight: '1.5' }}>
+                                                <Markdown options={{ wrapper: 'div', forceBlock: false }}>{note.content || ''}</Markdown>
+                                            </div>
                                         )}
 
                                         {/* Tags Row */}
@@ -324,13 +343,29 @@ function Dashboard() {
                                 onChange={(e) => setTitle(e.target.value)}
                                 required
                             />
-                            <textarea
-                                style={{ width: '100%', padding: '8px 0', background: 'transparent', border: 'none', color: dm.text, fontSize: '14px', lineHeight: '1.7', resize: 'none', marginBottom: '20px', boxSizing: 'border-box', outline: 'none', minHeight: '100px' }}
-                                placeholder="Take a note..."
-                                value={content}
-                                onChange={(e) => setContent(e.target.value)}
-                                rows={4}
-                            />
+                            <div style={{ border: `1px solid ${dm.border}`, borderRadius: '10px', marginBottom: '20px', overflow: 'hidden' }}>
+                                {/* Toolbar */}
+                                <div style={{ background: dm.inputBg, padding: '8px 12px', borderBottom: `1px solid ${dm.border}`, display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                                    {[
+                                        { label: 'B', action: () => editor.chain().focus().toggleBold().run(), style: { fontWeight: 'bold' } },
+                                        { label: 'I', action: () => editor.chain().focus().toggleItalic().run(), style: { fontStyle: 'italic' } },
+                                        { label: 'S', action: () => editor.chain().focus().toggleStrike().run(), style: { textDecoration: 'line-through' } },
+                                        { label: 'H1', action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(), style: {} },
+                                        { label: 'H2', action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(), style: {} },
+                                        { label: '• List', action: () => editor.chain().focus().toggleBulletList().run(), style: {} },
+                                        { label: '1. List', action: () => editor.chain().focus().toggleOrderedList().run(), style: {} },
+                                    ].map((btn) => (
+                                        <button key={btn.label} type="button" onClick={btn.action}
+                                            style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.1)', border: `1px solid ${dm.border}`, borderRadius: '6px', color: dm.text, cursor: 'pointer', fontSize: '13px', ...btn.style }}>
+                                            {btn.label}
+                                        </button>
+                                    ))}
+                                </div>
+                                {/* Editor */}
+                                <div style={{ padding: '12px', height: '150px', minHeight: '150px', maxHeight: '150px', overflowY: 'auto', background: dm.inputBg, color: dm.text }}>
+                                    <EditorContent editor={editor} />
+                                </div>
+                            </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
                                 <div>
