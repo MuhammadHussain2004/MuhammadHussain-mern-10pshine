@@ -27,26 +27,22 @@ const notesController = {
     // Create note
     createNote: async (req, res, next) => {
         try {
-            const { title, content } = req.body;
+            const { title, content, color, priority, category } = req.body;
             if (!title) {
                 return res.status(400).json({ message: 'Title is required!' });
             }
-            const noteId = await NoteModel.create(title, content, req.userId);
-            res.status(201).json({
-                message: 'Note created successfully!',
-                noteId
-            });
+            const noteId = await NoteModel.create(title, content, req.userId, color, priority, category);
+            res.status(201).json({ message: 'Note created successfully!', noteId });
         } catch (error) {
             next(error);
         }
     },
 
-    // Update note
     updateNote: async (req, res, next) => {
         try {
-            const { title, content } = req.body;
+            const { title, content, color, priority, category } = req.body;
             const affected = await NoteModel.update(
-                req.params.id, title, content, req.userId
+                req.params.id, title, content, color, priority, category, req.userId
             );
             if (!affected) {
                 return res.status(404).json({ message: 'Note not found!' });

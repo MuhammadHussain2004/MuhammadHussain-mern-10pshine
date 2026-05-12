@@ -20,23 +20,21 @@ const NoteModel = {
     },
 
     // Create new note
-    create: async (title, content, userId) => {
+    create: async (title, content, userId, color, priority, category) => {
         const [result] = await pool.execute(
-            'INSERT INTO notes (title, content, user_id) VALUES (?, ?, ?)',
-            [title, content, userId]
+            'INSERT INTO notes (title, content, user_id, color, priority, category) VALUES (?, ?, ?, ?, ?, ?)',
+            [title, content, userId, color || '#3c3c3c', priority || 'medium', category || 'General']
         );
         return result.insertId;
     },
 
-    // Update note
-    update: async (id, title, content, userId) => {
+    update: async (id, title, content, color, priority, category, userId) => {
         const [result] = await pool.execute(
-            'UPDATE notes SET title = ?, content = ? WHERE id = ? AND user_id = ?',
-            [title, content, id, userId]
+            'UPDATE notes SET title = ?, content = ?, color = ?, priority = ?, category = ? WHERE id = ? AND user_id = ?',
+            [title, content, color || '#3c3c3c', priority || 'medium', category || 'General', id, userId]
         );
         return result.affectedRows;
     },
-
     // Delete note
     delete: async (id, userId) => {
         const [result] = await pool.execute(
