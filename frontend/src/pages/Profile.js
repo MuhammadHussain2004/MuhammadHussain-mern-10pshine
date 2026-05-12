@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 function Profile() {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
-    const [darkMode] = useState(true);
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    const [darkMode] = useState(savedDarkMode);
 
     const dm = {
         bg: darkMode ? '#202124' : '#f8f9fa',
@@ -16,8 +17,7 @@ function Profile() {
     };
 
     return (
-        <div style={{ minHeight: '100vh', background: dm.bg, fontFamily: "'Segoe UI', sans-serif" }}>
-
+        <div style={{ minHeight: '100vh', background: dm.bg, fontFamily: "'Segoe UI', sans-serif", paddingBottom: '40px' }}>
             {/* Header */}
             <header style={{ background: dm.card, borderBottom: `1px solid ${dm.border}`, padding: '0 24px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>

@@ -10,9 +10,32 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   try {
+  //     await register({ name, email, password });
+  //     navigate(`/verify-email?email=${email}`);
+  //   } catch (err) {
+  //     setError(err.response?.data?.message || 'Registration failed!');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    const emailDomain = email.split('@')[1];
+    const validDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com'];
+    if (!validDomains.includes(emailDomain)) {
+      setError('Please use a valid email (Gmail, Yahoo, Hotmail, Outlook, iCloud)');
+      setLoading(false);
+      return;
+    }
+
     try {
       await register({ name, email, password });
       navigate(`/verify-email?email=${email}`);
@@ -28,10 +51,10 @@ function Register() {
       <div style={s.card}>
         <div style={s.logoRow}>
           <svg width="42" height="42" viewBox="0 0 48 48" fill="none">
-            <rect width="48" height="48" rx="14" fill="#fbbc04"/>
-            <rect x="12" y="15" width="24" height="4" rx="2" fill="#fff"/>
-            <rect x="12" y="22" width="18" height="4" rx="2" fill="#fff"/>
-            <rect x="12" y="29" width="14" height="4" rx="2" fill="#fff"/>
+            <rect width="48" height="48" rx="14" fill="#fbbc04" />
+            <rect x="12" y="15" width="24" height="4" rx="2" fill="#fff" />
+            <rect x="12" y="22" width="18" height="4" rx="2" fill="#fff" />
+            <rect x="12" y="29" width="14" height="4" rx="2" fill="#fff" />
           </svg>
           <span style={s.logoText}>NoteFlow</span>
         </div>
