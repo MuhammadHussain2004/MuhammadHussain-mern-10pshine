@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { getNotes, createNote, updateNote, deleteNote } from '../services/api';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import Markdown from 'markdown-to-jsx';
 import { saveAs } from 'file-saver';
 
 
@@ -14,7 +13,7 @@ function Dashboard() {
     const [notes, setNotes] = useState([]);
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [color, setColor] = useState('#fff');
+    const [color, setColor] = useState('#3c3c3c');
     const [priority, setPriority] = useState('medium');
     const [category, setCategory] = useState('General');
     const [editingNote, setEditingNote] = useState(null);
@@ -23,8 +22,8 @@ function Dashboard() {
     const [filterPriority, setFilterPriority] = useState('All');
     const [filterView, setFilterView] = useState('all');
     const [showForm, setShowForm] = useState(false);
-    const [darkMode, setDarkMode] = useState(false);
-    const navigate = useNavigate();
+    const [viewNote, setViewNote] = useState(null);
+    const [darkMode, setDarkMode] = useState(() => localStorage.getItem('darkMode') === 'true'); const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
 
 
@@ -44,14 +43,14 @@ function Dashboard() {
 
     const NOTE_COLORS = [
         { bg: darkMode ? '#ffffff' : '#3c3c3c', label: darkMode ? 'White' : 'Dark Gray' },
-        { bg: '#b53428', label: 'Red' },
+        { bg: '#b5655e', label: 'Red' },
         { bg: '#f6b903', label: 'Yellow' },
         { bg: '#229e0f', label: 'Green' },
         { bg: '#18b7b1', label: 'Teal' },
         { bg: '#2672c8', label: 'Blue' },
         { bg: '#724982', label: 'Purple' },
         { bg: '#495f28', label: 'Olive' },
-        { bg: '#b94d16', label: 'Orange' },
+        { bg: '#879fbc', label: 'Orange' },
         { bg: '#b62b71', label: 'Pink' },
     ];
 
@@ -66,6 +65,7 @@ function Dashboard() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log('Color being saved:', color);
         try {
             if (editingNote) {
                 await updateNote(editingNote.id, { title, content, color, priority, category });
@@ -78,16 +78,16 @@ function Dashboard() {
     };
 
     const resetForm = () => {
-        setTitle(''); setContent(''); setColor('#fff');
+        setTitle(''); setContent('');
+        setColor(darkMode ? '#ffffff' : '#3c3c3c');
         setPriority('medium'); setCategory('General');
         setEditingNote(null); setShowForm(false);
     };
-
     const handleEdit = (note) => {
         setEditingNote(note);
         setTitle(note.title);
         setContent(note.content || '');
-        setColor(note.color || '#fff');
+        setColor(note.color || '#3c3c3c');
         setPriority(note.priority || 'medium');
         setCategory(note.category || 'General');
         setShowForm(true);
@@ -157,7 +157,7 @@ function Dashboard() {
     };
 
     const dm = {
-        bg: darkMode ? '#202124' : '#f0f0f0',
+        bg: darkMode ? '#202124' : '#e4e4e4',
         header: darkMode ? '#292a2d' : '#ffffff',
         text: darkMode ? '#e8eaed' : '#202124',
         subtext: darkMode ? '#9aa0a6' : '#5f6368',
@@ -167,7 +167,7 @@ function Dashboard() {
         cardHover: darkMode ? '0 4px 16px rgba(0,0,0,0.5)' : '0 4px 16px rgba(0,0,0,0.15)',
         modalBg: darkMode ? '#292a2d' : '#ffffff',
         inputBg: darkMode ? '#303134' : '#f0f0f0',
-        sidebar: darkMode ? '#292a2d' : '#e8e8e8',
+        sidebar: darkMode ? '#292a2d' : '#f0f0f0',
     };
 
     return (
@@ -195,8 +195,7 @@ function Dashboard() {
                         <rect x="8" y="15" width="12" height="2.5" rx="1.25" fill="#fff" />
                         <rect x="8" y="20" width="10" height="2.5" rx="1.25" fill="#fff" />
                     </svg>
-                    <span style={{ fontSize: '22px', fontWeight: '400', color: dm.text, letterSpacing: '-0.3px' }}>Keep</span>
-                </div>
+                    <span style={{ fontSize: '22px', fontWeight: '400', color: dm.text, letterSpacing: '-0.3px' }}>NoteFlow</span>                </div>
 
                 {/* Search */}
                 <div style={{ flex: 1, maxWidth: '720px', margin: '0 24px', display: 'flex', alignItems: 'center', gap: '12px', background: dm.searchBg, borderRadius: '24px', padding: '0 16px', height: '46px', border: `1px solid transparent` }}>
@@ -214,7 +213,10 @@ function Dashboard() {
 
                 {/* Right side */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <button onClick={() => setDarkMode(!darkMode)} style={{ background: 'none', border: 'none', color: dm.subtext, width: '40px', height: '40px', borderRadius: '50%', fontSize: '18px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <button onClick={() => {
+                        setDarkMode(!darkMode);
+                        localStorage.setItem('darkMode', !darkMode);
+                    }} style={{ background: 'none', border: 'none', color: dm.subtext, width: '40px', height: '40px', borderRadius: '50%', fontSize: '18px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {darkMode ? '☀️' : '🌙'}
                     </button>
                     <div onClick={() => navigate('/profile')} style={{ width: '36px', height: '36px', background: '#fbbc04', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', fontWeight: '600', color: '#202124', cursor: 'pointer' }} title={user?.name}>
@@ -229,8 +231,7 @@ function Dashboard() {
             <div style={{ display: 'flex', minHeight: 'calc(100vh - 64px)' }}>
 
                 {/* Sidebar */}
-                <aside style={{ width: '280px', padding: '12px 8px', background: dm.sidebar, flexShrink: 0, borderRight: `2px solid ${dm.border}` }}>
-                    {/* New Note Button */}
+                <aside style={{ width: '280px', padding: '12px 8px', background: dm.sidebar, flexShrink: 0, borderRight: `2px solid ${dm.border}`, position: 'sticky', top: '64px', height: 'calc(100vh - 64px)', overflowY: 'auto' }}>                    {/* New Note Button */}
                     <button
                         onClick={() => { resetForm(); setShowForm(true); }}
                         style={{ width: '100%', padding: '14px 16px', background: '#fbbc04', border: 'none', borderRadius: '12px', color: '#202124', fontWeight: '600', fontSize: '14px', cursor: 'pointer', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 2px 8px rgba(251,188,4,0.4)' }}
@@ -238,14 +239,15 @@ function Dashboard() {
                         <span style={{ fontSize: '18px' }}>+</span> New Note
                     </button>
 
-                    <button onClick={exportNotes} style={{ width: '100%', padding: '10px 16px', background: 'transparent', border: `1px solid ${dm.border}`, borderRadius: '12px', color: dm.text, fontWeight: '500', fontSize: '13px', cursor: 'pointer', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                        ⬇️ Export Notes
-                    </button>
-
-                    <label style={{ width: '100%', padding: '10px 16px', background: 'transparent', border: `1px solid ${dm.border}`, borderRadius: '12px', color: dm.text, fontWeight: '500', fontSize: '13px', cursor: 'pointer', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxSizing: 'border-box' }}>
-                        ⬆️ Import Notes
-                        <input type="file" accept=".json" onChange={importNotes} style={{ display: 'none' }} />
-                    </label>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '20px' }}>
+                        <button onClick={exportNotes} style={{ padding: '10px 8px', background: darkMode ? 'rgba(251,188,4,0.1)' : 'rgba(251,188,4,0.15)', border: '1px solid rgba(251,188,4,0.4)', borderRadius: '10px', color: '#e37400', fontWeight: '600', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                            ⬇️ Export
+                        </button>
+                        <label style={{ padding: '10px 8px', background: darkMode ? 'rgba(251,188,4,0.1)' : 'rgba(251,188,4,0.15)', border: '1px solid rgba(251,188,4,0.4)', borderRadius: '10px', color: '#e37400', fontWeight: '600', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', boxSizing: 'border-box' }}>
+                            ⬆️ Import
+                            <input type="file" accept=".json" onChange={importNotes} style={{ display: 'none' }} />
+                        </label>
+                    </div>
 
                     {/* Stats */}
                     <div style={{ marginBottom: '20px', padding: '0 8px' }}>
@@ -255,7 +257,7 @@ function Dashboard() {
                             { label: 'High Priority', value: notes.filter(n => n.priority === 'high').length, icon: '🔴', view: 'high' },
                             { label: 'This Week', value: notes.filter(n => new Date(n.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length, icon: '📅', view: 'week' },
                         ].map(item => (
-                            <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: '10px', marginBottom: '4px', background: filterView === item.view ? (darkMode ? 'rgba(251,188,4,0.15)' : 'rgba(251,188,4,0.12)') : 'transparent', cursor: 'pointer' }}
+                            <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: '10px', marginBottom: '4px', background: filterView === item.view ? (darkMode ? 'rgba(251,188,4,0.25)' : 'rgba(251,188,4,0.15)') : 'transparent', cursor: 'pointer' }}
                                 onClick={() => setFilterView(item.view)}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                     <span>{item.icon}</span>
@@ -272,7 +274,7 @@ function Dashboard() {
                         {['All', ...CATEGORIES].map(cat => (
                             <div key={cat}
                                 onClick={() => setFilterCategory(cat)}
-                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: '10px', marginBottom: '4px', background: filterCategory === cat ? (darkMode ? 'rgba(251,188,4,0.15)' : 'rgba(251,188,4,0.12)') : 'transparent', cursor: 'pointer', color: filterCategory === cat ? '#e37400' : dm.text }}
+                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: '10px', marginBottom: '4px', background: filterCategory === cat ? (darkMode ? 'rgba(251,188,4,0.25)' : 'rgba(251,188,4,0.15)') : 'transparent', cursor: 'pointer', color: filterCategory === cat ? '#e37400' : dm.text }}
                             >
                                 <span style={{ fontSize: '14px' }}>{cat === 'All' ? '📁 All' : cat}</span>
                                 {cat !== 'All' && (
@@ -288,9 +290,10 @@ function Dashboard() {
                         {['All', ...PRIORITIES].map(p => (
                             <div key={p}
                                 onClick={() => setFilterPriority(p)}
-                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: '10px', marginBottom: '4px', background: filterPriority === p ? (darkMode ? 'rgba(251,188,4,0.15)' : 'rgba(251,188,4,0.12)') : 'transparent', cursor: 'pointer', color: filterPriority === p ? '#e37400' : dm.text }}
+                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: '10px', marginBottom: '4px', background: filterPriority === p ? (darkMode ? 'rgba(251,188,4,0.25)' : 'rgba(251,188,4,0.15)') : 'transparent', cursor: 'pointer', color: filterPriority === p ? '#e37400' : dm.text }}
                             >
                                 <span style={{ fontSize: '14px' }}>{p === 'All' ? '⚡ All' : p.charAt(0).toUpperCase() + p.slice(1)}</span>
+                                <span style={{ fontSize: '12px', color: dm.subtext }}>{p !== 'All' ? notes.filter(n => n.priority === p).length : ''}</span>
                             </div>
                         ))}
                     </div>
@@ -312,55 +315,64 @@ function Dashboard() {
                             <p style={{ fontSize: '14px' }}>{search ? `No results for "${search}"` : 'Click "+ New Note" to get started'}</p>
                         </div>
                     ) : (
-                        <div style={{ columns: '3 280px', gap: '16px' }}>
-                            {filteredNotes.map((note) => {
-                                const noteColor = note.color || '#fff';
-                                const isNeutralColor = noteColor === '#ffffff' || noteColor === '#3c3c3c';
-                                const cardBg = isNeutralColor ? (darkMode ? '#ffffff' : '#3c3c3c') : noteColor;
-                                const cardText = (isNeutralColor && !darkMode) ? '#ffffff' : '#202124';
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>                            {filteredNotes.map((note) => {
+                            const noteColor = note.color || '#3c3c3c';
+                            const isNeutralColor = noteColor === '#ffffff' || noteColor === '#3c3c3c';
+                            const cardBg = isNeutralColor ? (darkMode ? '#ffffff' : '#3c3c3c') : noteColor; const cardText = darkMode ? '#202124' : '#ffffff';
+                            return (
+                                <div key={note.id}
+                                    style={{ background: cardBg, border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.12)'}`, borderRadius: '12px', padding: '16px', marginBottom: '16px', boxShadow: dm.cardShadow, transition: 'all 0.2s ease', cursor: 'default', width: '100%', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }} onMouseLeave={e => { e.currentTarget.style.boxShadow = dm.cardShadow; e.currentTarget.style.transform = 'translateY(0)'; }}
+                                    onClick={() => setViewNote(note)}
 
-                                return (
-                                    <div key={note.id}
-                                        style={{ background: cardBg, border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.12)'}`, borderRadius: '12px', padding: '16px', marginBottom: '16px', breakInside: 'avoid', boxShadow: dm.cardShadow, transition: 'all 0.2s ease', cursor: 'default', display: 'inline-block', width: '100%', boxSizing: 'border-box' }}
-                                        onMouseEnter={e => { e.currentTarget.style.boxShadow = dm.cardHover; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                                        onMouseLeave={e => { e.currentTarget.style.boxShadow = dm.cardShadow; e.currentTarget.style.transform = 'translateY(0)'; }}
-                                    >
-                                        {/* Title */}
-                                        {note.title && (
-                                            <h4 style={{ color: cardText, margin: '0 0 8px', fontSize: '15px', fontWeight: '500', lineHeight: '1.4' }}>{note.title}</h4>
-                                        )}
+                                >
+                                    {/* Title */}
+                                    {note.title && (
+                                        <h4 style={{ color: cardText, margin: '0 0 8px', fontSize: '15px', fontWeight: '500', lineHeight: '1.4', wordBreak: 'break-word', whiteSpace: 'normal' }}>{note.title}</h4>)}
 
-                                        {/* Content */}
-                                        {note.content && (
-                                            <div style={{ maxHeight: '80px', overflow: 'hidden', fontSize: '13px', lineHeight: '1.5' }}>
-                                                <Markdown options={{ wrapper: 'div', forceBlock: false }}>{note.content || ''}</Markdown>
-                                            </div>
-                                        )}
+                                    {/* Content */}
+                                    {note.content && (
+                                        <div className="note-content" style={{
+                                            maxHeight: '75px',
+                                            overflow: 'hidden',
+                                            WebkitLineClamp: 4,
+                                            display: '-webkit-box',
+                                            WebkitBoxOrient: 'vertical',
+                                            fontSize: '12px',
+                                            lineHeight: '1.5',
+                                            color: cardText,
+                                            marginBottom: '12px',
+                                            wordBreak: 'break-word'
+                                        }}
+                                            dangerouslySetInnerHTML={{
+                                                __html: note.content
+                                                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                            }}
+                                        />)}
 
-                                        {/* Tags Row */}
-                                        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '12px' }}>
-                                            <span style={{ background: priorityConfig[note.priority]?.bg || priorityConfig.medium.bg, color: priorityConfig[note.priority]?.color || priorityConfig.medium.color, padding: '2px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: '500' }}>
-                                                {note.priority || 'medium'}
-                                            </span>
-                                            <span style={{ background: 'rgba(0,0,0,0.08)', color: cardText, padding: '2px 10px', borderRadius: '12px', fontSize: '11px', opacity: 0.7 }}>
-                                                {note.category || 'General'}
-                                            </span>
-                                        </div>
-
-                                        {/* Actions */}
-                                        <div style={{ display: 'flex', gap: '4px', borderTop: `1px solid rgba(0,0,0,0.08)`, paddingTop: '10px' }}>
-                                            <button onClick={() => handleEdit(note)} style={{ background: 'none', border: 'none', color: cardText, padding: '6px 10px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', opacity: 0.6, display: 'flex', alignItems: 'center', gap: '4px' }}
-                                                onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-                                                onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}
-                                            >✏️ Edit</button>
-                                            <button onClick={() => handleDelete(note.id)} style={{ background: 'none', border: 'none', color: '#c5221f', padding: '6px 10px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', opacity: 0.6, display: 'flex', alignItems: 'center', gap: '4px' }}
-                                                onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-                                                onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}
-                                            >🗑️ Delete</button>
-                                        </div>
+                                    {/* Tags Row */}
+                                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                                        <span style={{ background: priorityConfig[note.priority]?.bg || priorityConfig.medium.bg, color: priorityConfig[note.priority]?.color || priorityConfig.medium.color, padding: '2px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: '500' }}>
+                                            {note.priority || 'medium'}
+                                        </span>
+                                        <span style={{ background: 'rgba(0,0,0,0.08)', color: cardText, padding: '2px 10px', borderRadius: '12px', fontSize: '11px', opacity: 0.7 }}>
+                                            {note.category || 'General'}
+                                        </span>
                                     </div>
-                                );
-                            })}
+
+                                    {/* Actions */}
+                                    <div style={{ display: 'flex', gap: '4px', borderTop: `1px solid rgba(0,0,0,0.08)`, paddingTop: '10px', marginTop: 'auto' }}>                                         <button onClick={(e) => { e.stopPropagation(); handleEdit(note); }} style={{ background: 'none', border: 'none', color: cardText, padding: '6px 10px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', opacity: 0.6, display: 'flex', alignItems: 'center', gap: '4px' }}
+                                        onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+                                        onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}
+                                    >✏️ Edit</button>
+                                        <button onClick={(e) => { e.stopPropagation(); handleDelete(note.id); }} style={{ background: 'none', border: 'none', color: '#c5221f', padding: '6px 10px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', opacity: 0.6, display: 'flex', alignItems: 'center', gap: '4px' }}
+                                            onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+                                            onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}
+                                        >🗑️ Delete</button>
+                                    </div>
+                                </div>
+                            );
+                        })}
                         </div>
                     )}
                 </main>
@@ -396,13 +408,12 @@ function Dashboard() {
                                         { label: 'H1', action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(), style: {} },
                                         { label: 'H2', action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(), style: {} },
                                         { label: '• List', action: () => editor.chain().focus().toggleBulletList().run(), style: {} },
-                                        { label: '1. List', action: () => editor.chain().focus().toggleOrderedList().run(), style: {} },
-                                    ].map((btn) => (
-                                        <button key={btn.label} type="button" onClick={btn.action}
-                                            style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.1)', border: `1px solid ${dm.border}`, borderRadius: '6px', color: dm.text, cursor: 'pointer', fontSize: '13px', ...btn.style }}>
-                                            {btn.label}
-                                        </button>
-                                    ))}
+                                        { label: '1. List', action: () => editor.chain().focus().toggleOrderedList().run(), style: {} },].map((btn) => (
+                                            <button key={btn.label} type="button" onClick={btn.action}
+                                                style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.1)', border: `1px solid ${dm.border}`, borderRadius: '6px', color: dm.text, cursor: 'pointer', fontSize: '13px', ...btn.style }}>
+                                                {btn.label}
+                                            </button>
+                                        ))}
                                 </div>
                                 {/* Editor */}
                                 <div style={{ padding: '12px', height: '150px', minHeight: '150px', maxHeight: '150px', overflowY: 'auto', background: dm.inputBg, color: dm.text }}>
@@ -449,6 +460,77 @@ function Dashboard() {
                     </div>
                 </div>
             )}
+            {viewNote && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2000, padding: '20px' }}
+                    onClick={() => setViewNote(null)}>
+                    <div style={{
+                        background: (() => {
+                            const nc = viewNote.color || '#3c3c3c';
+                            if (nc === '#ffffff') return darkMode ? '#ffffff' : '#3c3c3c';
+                            if (nc === '#3c3c3c') return darkMode ? '#ffffff' : '#3c3c3c';
+                            return nc;
+                        })(), borderRadius: '20px', padding: '0', width: '600px', maxWidth: '95vw', maxHeight: '85vh', overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column'
+                    }}
+                        onClick={e => e.stopPropagation()}>
+
+                        {/* Modal Header */}
+                        <div style={{ padding: '24px 28px 16px', borderBottom: `1px solid rgba(255,255,255,0.1)`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <h2 style={{
+                                color: (() => {
+                                    const nc = viewNote.color || '#3c3c3c';
+                                    if (nc === '#ffffff' || nc === '#3c3c3c') return darkMode ? '#202124' : '#ffffff';
+                                    return darkMode ? '#202124' : '#ffffff';
+                                })(), margin: 0, fontSize: '18px', fontWeight: '600', lineHeight: '1.3', flex: 1, marginRight: '16px', wordBreak: 'break-word'
+                            }}>{viewNote.title}</h2>
+                            <button onClick={() => setViewNote(null)} style={{
+                                background: 'rgba(255,255,255,0.15)', border: 'none', color: (() => {
+                                    const nc = viewNote.color || '#3c3c3c';
+                                    if (nc === '#ffffff' || nc === '#3c3c3c') return darkMode ? '#202124' : '#ffffff';
+                                    return darkMode ? '#202124' : '#ffffff';
+                                })(), width: '32px', height: '32px', borderRadius: '50%', fontSize: '18px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                            }}>×</button>
+                        </div>
+
+                        {/* Modal Content */}
+                        <div style={{ padding: '20px 28px', overflowY: 'auto', flex: 1 }}>
+                            <div style={{
+                                color: (() => {
+                                    const nc = viewNote.color || '#3c3c3c';
+                                    if (nc === '#ffffff' || nc === '#3c3c3c') return darkMode ? '#202124' : '#ffffff';
+                                    return darkMode ? '#202124' : '#ffffff';
+                                })(), lineHeight: '1.6', fontSize: '13px', wordBreak: 'break-word', overflowWrap: 'break-word'
+                            }}
+                                dangerouslySetInnerHTML={{
+                                    __html: (viewNote.content || '')
+                                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                }}
+                            />
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div style={{ padding: '16px 28px', borderTop: `1px solid rgba(255,255,255,0.1)`, display: 'flex', gap: '8px', alignItems: 'center' }}>
+                            <span style={{ background: priorityConfig[viewNote.priority]?.bg, color: priorityConfig[viewNote.priority]?.color, padding: '4px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: '600' }}>{viewNote.priority}</span>
+                            <span style={{
+                                background: 'rgba(255,255,255,0.15)', color: (() => {
+                                    const nc = viewNote.color || '#3c3c3c';
+                                    if (nc === '#ffffff' || nc === '#3c3c3c') return darkMode ? '#202124' : '#ffffff';
+                                    return darkMode ? '#202124' : '#ffffff';
+                                })(), padding: '4px 14px', borderRadius: '20px', fontSize: '12px'
+                            }}>{viewNote.category}</span>
+                            <button onClick={() => { setViewNote(null); handleEdit(viewNote); }} style={{
+                                marginLeft: 'auto', padding: '8px 20px', background: 'rgba(255,255,255,0.15)', border: 'none', color: (() => {
+                                    const nc = viewNote.color || '#3c3c3c';
+                                    if (nc === '#ffffff' || nc === '#3c3c3c') return darkMode ? '#202124' : '#ffffff';
+                                    return darkMode ? '#202124' : '#ffffff';
+                                })(), borderRadius: '10px', fontSize: '13px', fontWeight: '600', cursor: 'pointer'
+                            }}>✏️ Edit</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
         </div>
     );
 }

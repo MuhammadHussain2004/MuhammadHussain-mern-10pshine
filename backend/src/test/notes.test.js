@@ -9,13 +9,12 @@ let token = '';
 let noteId = '';
 
 describe('Notes APIs', () => {
-
     before((done) => {
         chai.request(app)
             .post('/api/auth/login')
             .send({
-                email: 'testuser@test.com',
-                password: 'test1234'
+                email: 'mhkplayer14@gmail.com',
+                password: '10pshine@1234'
             })
             .end((err, res) => {
                 token = res.body.token;
