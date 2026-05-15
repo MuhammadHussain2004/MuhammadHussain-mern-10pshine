@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const UserModel = require('../models/userModel');
 const { sendVerificationEmail } = require('../config/emailService');
+const { logger, logActivity } = require('../config/logger');
 
 const authController = {
     register: async (req, res, next) => {
@@ -13,6 +14,7 @@ const authController = {
 
             // Agar user exist karta hai aur verified hai
             if (existingUser && existingUser.is_verified) {
+                logger.warn({ msg: 'Registration failed: Email already registered', email });
                 return res.status(400).json({ message: 'Email already registered!' });
             }
 
@@ -31,15 +33,17 @@ const authController = {
             try {
                 await sendVerificationEmail(email, name, verificationCode);
             } catch (emailError) {
-                console.error('Email sending failed:', emailError);
+                logger.error({ msg: 'Email sending failed', error: emailError.message, email });
                 return res.status(500).json({ message: 'Failed to send verification email: ' + emailError.message });
             }
 
+            logActivity('USER_REGISTERED', null, { email });
             res.status(201).json({
                 message: 'Registration successful! Please check your email for verification code.',
                 email
             });
         } catch (error) {
+            logger.error({ msg: 'Error during registration', error: error.message });
             next(error);
         }
     },
@@ -49,8 +53,10 @@ const authController = {
             const { email, code } = req.body;
             const isVerified = await UserModel.verifyEmail(email, code);
             if (!isVerified) {
+                logger.warn({ msg: 'Email verification failed: Invalid code', email });
                 return res.status(400).json({ message: 'Invalid or expired verification code!' });
             }
+            logActivity('EMAIL_VERIFIED', null, { email });
             res.json({ message: 'Email verified successfully! You can now login.' });
         } catch (error) {
             next(error);
@@ -63,15 +69,18 @@ const authController = {
 
             const user = await UserModel.findByEmail(email);
             if (!user) {
+                logger.warn({ msg: 'Login failed: Invalid email', email });
                 return res.status(401).json({ message: 'Invalid email or password!' });
             }
 
             if (!user.is_verified) {
+                logger.warn({ msg: 'Login failed: Unverified email', email });
                 return res.status(401).json({ message: 'Invalid email or password!' });
             }
 
             const isPasswordValid = await bcrypt.compare(password, user.password);
             if (!isPasswordValid) {
+                logger.warn({ msg: 'Login failed: Invalid password', email });
                 return res.status(401).json({ message: 'Invalid email or password!' });
             }
 
@@ -81,6 +90,7 @@ const authController = {
                 { expiresIn: '24h' }
             );
 
+            logActivity('USER_LOGIN', user.id, { email: user.email });
             res.json({
                 message: 'Login successful!',
                 token,
