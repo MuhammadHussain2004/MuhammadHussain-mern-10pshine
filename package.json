@@ -1,0 +1,20 @@
+{
+    "name": "notes-app-monorepo",
+    "private": true,
+    "workspaces": [
+        "backend",
+        "frontend"
+    ],
+    "scripts": {
+        "preanalyze": "npm install",
+        "coverage:backend": "npm --prefix backend run coverage",
+        "coverage:frontend": "npm --prefix frontend run coverage",
+        "coverage": "npm run coverage:backend && npm run coverage:frontend",
+        "sonar": "npx sonar-scanner -Dsonar.token=%SONAR_TOKEN%",
+        "analyze": "npm run coverage && npm run sonar",
+        "analyze:open": "npm run analyze && start \"\" \"http://localhost:9000/dashboard?id=notes-app\""
+    },
+    "devDependencies": {
+        "sonar-scanner": "^3.1.0"
+    }
+}
