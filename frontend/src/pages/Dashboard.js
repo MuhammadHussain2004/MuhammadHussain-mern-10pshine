@@ -23,6 +23,7 @@ function Dashboard() {
     const [filterView, setFilterView] = useState('all');
     const [showForm, setShowForm] = useState(false);
     const [viewNote, setViewNote] = useState(null);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [darkMode, setDarkMode] = useState(() => localStorage.getItem('darkMode') === 'true'); const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
 
@@ -187,18 +188,25 @@ function Dashboard() {
                 zIndex: 100,
                 boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
             }}>
-                {/* Logo */}
+                {/* Hamburger & Logo */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button 
+                        className="hamburger-btn" 
+                        style={{ color: dm.text }}
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    >
+                        ☰
+                    </button>
                     <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                         <rect width="32" height="32" rx="8" fill="#fbbc04" />
                         <rect x="8" y="10" width="16" height="2.5" rx="1.25" fill="#fff" />
                         <rect x="8" y="15" width="12" height="2.5" rx="1.25" fill="#fff" />
                         <rect x="8" y="20" width="10" height="2.5" rx="1.25" fill="#fff" />
                     </svg>
-                    <span style={{ fontSize: '22px', fontWeight: '400', color: dm.text, letterSpacing: '-0.3px' }}>NoteFlow</span>                </div>
+                    <span className="header-logo-text" style={{ fontSize: '22px', fontWeight: '400', color: dm.text, letterSpacing: '-0.3px' }}>NoteFlow</span>                </div>
 
                 {/* Search */}
-                <div style={{ flex: 1, maxWidth: '720px', margin: '0 24px', display: 'flex', alignItems: 'center', gap: '12px', background: dm.searchBg, borderRadius: '24px', padding: '0 16px', height: '46px', border: `1px solid transparent` }}>
+                <div className="header-search" style={{ background: dm.searchBg }}>
                     <span style={{ color: dm.subtext, fontSize: '18px' }}>🔍</span>
                     <input
                         style={{ flex: 1, background: 'transparent', border: 'none', color: dm.text, fontSize: '16px', outline: 'none' }}
@@ -231,7 +239,13 @@ function Dashboard() {
             <div style={{ display: 'flex', minHeight: 'calc(100vh - 64px)' }}>
 
                 {/* Sidebar */}
-                <aside style={{ width: '280px', padding: '12px 8px', background: dm.sidebar, flexShrink: 0, borderRight: `2px solid ${dm.border}`, position: 'sticky', top: '64px', height: 'calc(100vh - 64px)', overflowY: 'auto' }}>                    {/* New Note Button */}
+                {isMobileMenuOpen && (
+                    <div 
+                        style={{ position: 'fixed', top: '64px', left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 998 }}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    />
+                )}
+                <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`} style={{ background: dm.sidebar, borderRight: `2px solid ${dm.border}` }}>                    {/* New Note Button */}
                     <button
                         onClick={() => { resetForm(); setShowForm(true); }}
                         style={{ width: '100%', padding: '14px 16px', background: '#fbbc04', border: 'none', borderRadius: '12px', color: '#202124', fontWeight: '600', fontSize: '14px', cursor: 'pointer', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 2px 8px rgba(251,188,4,0.4)' }}
@@ -315,7 +329,7 @@ function Dashboard() {
                             <p style={{ fontSize: '14px' }}>{search ? `No results for "${search}"` : 'Click "+ New Note" to get started'}</p>
                         </div>
                     ) : (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>                            {filteredNotes.map((note) => {
+                        <div className="notes-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>                            {filteredNotes.map((note) => {
                             const noteColor = note.color || '#3c3c3c';
                             const isNeutralColor = noteColor === '#ffffff' || noteColor === '#3c3c3c';
                             const cardBg = isNeutralColor ? (darkMode ? '#ffffff' : '#3c3c3c') : noteColor; const cardText = darkMode ? '#202124' : '#ffffff';
@@ -463,13 +477,13 @@ function Dashboard() {
             {viewNote && (
                 <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2000, padding: '20px' }}
                     onClick={() => setViewNote(null)}>
-                    <div style={{
+                    <div className="note-modal-content" style={{
                         background: (() => {
                             const nc = viewNote.color || '#3c3c3c';
                             if (nc === '#ffffff') return darkMode ? '#ffffff' : '#3c3c3c';
                             if (nc === '#3c3c3c') return darkMode ? '#ffffff' : '#3c3c3c';
                             return nc;
-                        })(), borderRadius: '20px', padding: '0', width: '600px', maxWidth: '95vw', maxHeight: '85vh', overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column'
+                        })(), borderRadius: '20px', padding: '0', maxHeight: '85vh', overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column'
                     }}
                         onClick={e => e.stopPropagation()}>
 

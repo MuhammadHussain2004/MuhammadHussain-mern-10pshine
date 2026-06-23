@@ -26,7 +26,7 @@ function Login() {
 
   return (
     <div style={s.container}>
-      <div style={s.card}>
+      <div className="auth-card" style={s.card}>
         {/* Logo */}
         <div style={s.logoRow}>
           <svg width="42" height="42" viewBox="0 0 48 48" fill="none">

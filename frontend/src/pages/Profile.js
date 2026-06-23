@@ -37,7 +37,7 @@ function Profile() {
             <div style={{ maxWidth: '680px', margin: '40px auto', padding: '0 20px' }}>
 
                 {/* Profile Card */}
-                <div style={{ background: dm.card, borderRadius: '20px', padding: '40px', border: `1px solid ${dm.border}`, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', marginBottom: '20px' }}>
+                <div className="auth-card" style={{ background: dm.card, borderRadius: '20px', padding: '40px', border: `1px solid ${dm.border}`, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', marginBottom: '20px' }}>
 
                     {/* Avatar */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginBottom: '32px' }}>
