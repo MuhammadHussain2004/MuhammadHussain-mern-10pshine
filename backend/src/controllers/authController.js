@@ -18,7 +18,7 @@ const authController = {
                 return res.status(400).json({ message: 'Email already registered!' });
             }
 
-            const verificationCode = '123456'; // Hardcoded for Railway bypass
+            const verificationCode = crypto.randomInt(100000, 999999).toString();
             const verificationExpires = new Date(Date.now() + 10 * 60 * 1000);
             const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -31,9 +31,8 @@ const authController = {
             }
 
             try {
-                // Railway free tier blocks SMTP ports, so we bypass actual email sending
-                // await sendVerificationEmail(email, name, verificationCode);
-                logger.info({ msg: 'Email sending bypassed on Railway. OTP is 123456', email });
+                await sendVerificationEmail(email, name, verificationCode);
+                logger.info({ msg: 'Verification email sent successfully', email });
             } catch (emailError) {
                 logger.error({ msg: 'Email sending failed', error: emailError.message, email });
                 return res.status(500).json({ message: 'Failed to send verification email: ' + emailError.message });
@@ -41,7 +40,7 @@ const authController = {
 
             logActivity('USER_REGISTERED', null, { email });
             res.status(201).json({
-                message: 'Registration successful! Use OTP 123456 to verify.',
+                message: 'Registration successful! Please check your email for verification code.',
                 email
             });
         } catch (error) {
