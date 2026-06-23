@@ -18,29 +18,41 @@ const authController = {
                 return res.status(400).json({ message: 'Email already registered!' });
             }
 
-            const verificationCode = crypto.randomInt(100000, 999999).toString();
+            const isBypassed = process.env.BYPASS_EMAIL === 'true';
+            const verificationCode = isBypassed ? '123456' : crypto.randomInt(100000, 999999).toString();
             const verificationExpires = new Date(Date.now() + 10 * 60 * 1000);
             const hashedPassword = await bcrypt.hash(password, 10);
 
             // Agar user exist karta hai lekin verified nahi — update karo
             if (existingUser && !existingUser.is_verified) {
                 await UserModel.updateVerificationCode(email, hashedPassword, verificationCode, verificationExpires);
+                if (isBypassed) {
+                    await UserModel.verifyEmail(email, verificationCode);
+                }
             } else {
                 // Naya user banao
                 await UserModel.create(name, email, hashedPassword, verificationCode, verificationExpires);
+                if (isBypassed) {
+                    await UserModel.verifyEmail(email, verificationCode);
+                }
             }
 
-            try {
-                await sendVerificationEmail(email, name, verificationCode);
-                logger.info({ msg: 'Verification email sent successfully', email });
-            } catch (emailError) {
-                logger.error({ msg: 'Email sending failed', error: emailError.message, email });
-                return res.status(500).json({ message: 'Failed to send verification email: ' + emailError.message });
+            if (!isBypassed) {
+                try {
+                    await sendVerificationEmail(email, name, verificationCode);
+                    logger.info({ msg: 'Verification email sent successfully', email });
+                } catch (emailError) {
+                    logger.error({ msg: 'Email sending failed', error: emailError.message, email });
+                    return res.status(500).json({ message: 'Failed to send verification email: ' + emailError.message });
+                }
+            } else {
+                logger.info({ msg: 'Email sending bypassed via BYPASS_EMAIL flag', email });
             }
 
             logActivity('USER_REGISTERED', null, { email });
             res.status(201).json({
-                message: 'Registration successful! Please check your email for verification code.',
+                message: isBypassed ? 'Registration successful! You can now login.' : 'Registration successful! Please check your email for verification code.',
+                bypassed: isBypassed,
                 email
             });
         } catch (error) {

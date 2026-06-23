@@ -37,8 +37,13 @@ function Register() {
     }
 
     try {
-      await register({ name, email, password });
-      navigate(`/verify-email?email=${email}`);
+      const res = await register({ name, email, password });
+      if (res.data && res.data.bypassed) {
+        alert('Account registered successfully! Please login.');
+        navigate('/login');
+      } else {
+        navigate(`/verify-email?email=${email}`);
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed!');
     } finally {
