@@ -214,16 +214,22 @@ label:hover {
 
     /* Header adjustments */
     .header-logo-text {
-        display: none !important; /* Hide NoteFlow text on mobile to save space */
+        font-size: 16px !important; /* Slightly smaller logo text on mobile */
+    }
+    
+    .header-signout {
+        display: none !important; /* Hide signout button on mobile header to save space (available in profile) */
     }
 
     /* Shrink search bar margins */
     .header-search {
-        margin: 0 8px !important;
-        padding: 0 10px !important;
+        margin: 0 4px !important;
+        padding: 0 8px !important;
+        min-width: 100px;
     }
     .header-search input {
         width: 100%;
+        min-width: 50px;
     }
 
     /* Make grid single column gracefully */

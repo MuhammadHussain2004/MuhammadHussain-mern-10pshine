@@ -197,19 +197,19 @@ function Dashboard() {
                     >
                         ☰
                     </button>
-                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" style={{ flexShrink: 0 }}>
                         <rect width="32" height="32" rx="8" fill="#fbbc04" />
                         <rect x="8" y="10" width="16" height="2.5" rx="1.25" fill="#fff" />
                         <rect x="8" y="15" width="12" height="2.5" rx="1.25" fill="#fff" />
                         <rect x="8" y="20" width="10" height="2.5" rx="1.25" fill="#fff" />
                     </svg>
-                    <span className="header-logo-text" style={{ fontSize: '22px', fontWeight: '400', color: dm.text, letterSpacing: '-0.3px' }}>NoteFlow</span>                </div>
+                    <span className="header-logo-text" style={{ fontSize: '22px', fontWeight: '400', color: dm.text, letterSpacing: '-0.3px', flexShrink: 0 }}>NoteFlow</span>                </div>
 
                 {/* Search */}
                 <div className="header-search" style={{ background: dm.searchBg }}>
                     <span style={{ color: dm.subtext, fontSize: '18px' }}>🔍</span>
                     <input
-                        style={{ flex: 1, background: 'transparent', border: 'none', color: dm.text, fontSize: '16px', outline: 'none' }}
+                        style={{ flex: 1, background: 'transparent', border: 'none', color: dm.text, fontSize: '16px', outline: 'none', width: '100%' }}
                         placeholder="Search"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
@@ -220,17 +220,17 @@ function Dashboard() {
                 </div>
 
                 {/* Right side */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
                     <button onClick={() => {
                         setDarkMode(!darkMode);
                         localStorage.setItem('darkMode', !darkMode);
                     }} style={{ background: 'none', border: 'none', color: dm.subtext, width: '40px', height: '40px', borderRadius: '50%', fontSize: '18px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {darkMode ? '☀️' : '🌙'}
                     </button>
-                    <div onClick={() => navigate('/profile')} style={{ width: '36px', height: '36px', background: '#fbbc04', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', fontWeight: '600', color: '#202124', cursor: 'pointer' }} title={user?.name}>
+                    <div onClick={() => navigate('/profile')} style={{ width: '36px', height: '36px', background: '#fbbc04', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', fontWeight: '600', color: '#202124', cursor: 'pointer', flexShrink: 0 }} title={user?.name}>
                         {user?.name?.charAt(0).toUpperCase()}
                     </div>
-                    <button onClick={handleLogout} style={{ background: 'none', border: `1px solid ${dm.border}`, color: dm.subtext, padding: '6px 16px', borderRadius: '20px', fontSize: '13px', cursor: 'pointer' }}>
+                    <button className="header-signout" onClick={handleLogout} style={{ background: 'none', border: `1px solid ${dm.border}`, color: dm.subtext, padding: '6px 16px', borderRadius: '20px', fontSize: '13px', cursor: 'pointer' }}>
                         Sign out
                     </button>
                 </div>
