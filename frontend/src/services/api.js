@@ -2,8 +2,9 @@ import axios from 'axios';
 export const verifyEmail = (data) => API.post('/auth/verify-email', data);
 
 const API = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
 });
+
 
 // Automatically add token to every request
 API.interceptors.request.use((config) => {
