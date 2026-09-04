@@ -44,12 +44,18 @@ const start = async () => {
     try {
         await initDB();
         logger.info('Database initialized successfully!');
-        app.listen(PORT, () => {
-            logger.info(`Server running on port ${PORT}`);
-        });
+        // On Vercel, requests are handled by the exported app itself (serverless
+        // function) — there is no long-running process to bind a port on.
+        if (!process.env.VERCEL) {
+            app.listen(PORT, () => {
+                logger.info(`Server running on port ${PORT}`);
+            });
+        }
     } catch (error) {
         logger.error('Failed to start server:', error);
-        process.exit(1);
+        if (!process.env.VERCEL) {
+            process.exit(1);
+        }
     }
 };
 
