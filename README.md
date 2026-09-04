@@ -12,6 +12,7 @@ A MERN notes application with backend and frontend components.
 1. Start backend:
    - `cd backend`
    - `npm install`
+   - Copy `.env.example` to `.env` and fill in your MySQL credentials (the app auto-creates the database and tables on first run)
    - `npm start`
 
 2. Start frontend:

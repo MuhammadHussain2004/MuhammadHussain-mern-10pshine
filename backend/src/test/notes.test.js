@@ -1,6 +1,7 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const app = require('../app');
+const pool = require('../config/db');
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -8,17 +9,23 @@ const expect = chai.expect;
 let token = '';
 let noteId = '';
 
+const testEmail = `notestest_${Date.now()}@test.com`;
+const testPassword = 'test1234';
+
 describe('Notes APIs', () => {
     before((done) => {
         chai.request(app)
-            .post('/api/auth/login')
-            .send({
-                email: 'mhkplayer14@gmail.com',
-                password: '10pshine@1234'
-            })
-            .end((err, res) => {
-                token = res.body.token;
-                done();
+            .post('/api/auth/register')
+            .send({ name: 'Notes Test User', email: testEmail, password: testPassword })
+            .end(async () => {
+                await pool.execute('UPDATE users SET is_verified = TRUE WHERE email = ?', [testEmail]);
+                chai.request(app)
+                    .post('/api/auth/login')
+                    .send({ email: testEmail, password: testPassword })
+                    .end((err, res) => {
+                        token = res.body.token;
+                        done();
+                    });
             });
     });
 
